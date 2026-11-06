@@ -1,0 +1,265 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { PRODUCTS, WHATSAPP_NUMBER, formatPrice, getWhatsAppLink } from '../data/products';
+
+const faqs = [
+  { q: '¿Cuánto cuesta?', a: 'Todas las presentaciones cuestan $17.00 MXN. Cruji viene en 200 g y los demás sabores en 250 g.' },
+  { q: '¿Venden al mayoreo?', a: 'Escríbenos por WhatsApp con el sabor y la cantidad que necesitas, y te damos precio.' },
+  { q: '¿Cómo lo conservo?', a: 'Guárdalo en un lugar fresco y seco, y cierra bien la bolsa después de cada uso.' },
+  { q: '¿Cómo hago mi pedido?', a: 'Elige tu sabor, toca "Comprar ahora" y se abre WhatsApp con tu pedido listo para enviar.' },
+];
+const generalLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, tengo una duda sobre los empanizadores El Dorado.')}`;
+
+const navBtn = 'whitespace-nowrap rounded-full px-4 py-2 text-[11px] font-medium tracking-[0.18em] uppercase border border-[#E6E0D4] text-[#2B2A26] hover:border-[#2B2A26]/40 transition-colors';
+const drawerBtn = 'block w-full rounded-full px-5 py-3.5 text-[12px] font-medium tracking-[0.18em] uppercase border border-[#E6E0D4] text-[#2B2A26] transition-colors';
+const textGlow = 'drop-shadow-[0_1px_6px_rgba(60,50,30,0.22)]';
+const imgShadow = 'shadow-[0_24px_48px_-28px_rgba(60,50,30,0.35)]';
+---
+<Layout title="Empanizadores El Dorado | Elige tu sabor">
+  <!-- Selector fijo -->
+  <header class="fixed inset-x-0 top-0 z-50 bg-[#F7F4EE]/90 backdrop-blur border-b border-[#E6E0D4]">
+    <div class="mx-auto max-w-7xl flex items-center gap-3 md:gap-5 px-4 md:px-8 h-16">
+      <!-- Hamburguesa: solo móvil -->
+      <button id="menu-btn" type="button" aria-label="Abrir menú" aria-controls="drawer" aria-expanded="false"
+              class="md:hidden -ml-1 flex h-11 w-11 items-center justify-center rounded-full hover:bg-black/5 transition-colors">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <path d="M3 6h16M3 11h16M3 16h16" stroke="#2B2A26" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <a href="#inicio" class="font-display text-2xl shrink-0">El Dorado</a>
+
+      <!-- Menú superior: md en adelante -->
+      <nav aria-label="Sabores" class="hidden md:flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1">
+        {PRODUCTS.map((p) => (
+          <a href={`#${p.id}`} data-nav={p.id} data-accent={p.accent} data-ink={p.ink} class={navBtn}>{p.nav}</a>
+        ))}
+        <span class="w-px h-5 bg-[#E6E0D4] mx-1.5 shrink-0" aria-hidden="true"></span>
+        <a href="#historia" data-nav="historia" data-accent="#3F5A47" data-ink="#FFFFFF" class={navBtn}>Historia</a>
+        <a href="#faq" data-nav="faq" data-accent="#3F5A47" data-ink="#FFFFFF" class={navBtn}>FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Drawer móvil -->
+  <div id="overlay" class="md:hidden fixed inset-0 z-[60] bg-[#2B2A26]/40 opacity-0 pointer-events-none transition-opacity duration-300" aria-hidden="true"></div>
+  <aside id="drawer" aria-label="Menú de navegación" aria-hidden="true"
+         class="md:hidden fixed inset-y-0 left-0 z-[70] w-[80%] max-w-xs bg-[#F7F4EE] shadow-2xl -translate-x-full invisible transition-[transform,visibility] duration-300 flex flex-col">
+    <div class="flex items-center justify-between h-16 px-5 border-b border-[#E6E0D4]">
+      <span class="font-display text-2xl">El Dorado</span>
+      <button id="menu-close" type="button" aria-label="Cerrar menú" class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-black/5 transition-colors -mr-2">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 4l12 12M16 4L4 16" stroke="#2B2A26" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto p-5 space-y-2">
+      {PRODUCTS.map((p) => (
+        <a href={`#${p.id}`} data-drawer-link={p.id} data-accent={p.accent} data-ink={p.ink} class={drawerBtn}>{p.nav}</a>
+      ))}
+      <div class="h-px bg-[#E6E0D4] my-3" aria-hidden="true"></div>
+      <a href="#historia" data-drawer-link="historia" data-accent="#3F5A47" data-ink="#FFFFFF" class={drawerBtn}>Historia</a>
+      <a href="#faq" data-drawer-link="faq" data-accent="#3F5A47" data-ink="#FFFFFF" class={drawerBtn}>FAQ</a>
+    </nav>
+  </aside>
+
+  <!-- HERO fijo: se desvanece y desenfoca con el scroll -->
+  <section id="hero" class="fixed inset-0 z-0 h-[100svh] min-h-[85vh] overflow-hidden bg-[#C2A549] will-change-[opacity,transform,filter]">
+    <img src="/hero.jpg" alt="Las cinco presentaciones de empanizador El Dorado junto a trigo y ajo"
+         class="absolute inset-0 w-full h-full object-cover object-[50%_center] md:object-[center_15%]" fetchpriority="high" />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent md:hidden" aria-hidden="true"></div>
+    <div class="absolute inset-0 max-md:hidden" style="background:radial-gradient(60% 55% at 50% 50%, rgba(43,42,38,.55) 0%, rgba(43,42,38,.15) 100%)" aria-hidden="true"></div>
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+      <p class="font-display text-6xl sm:text-7xl md:text-8xl leading-[1] text-[#F7F4EE] [text-shadow:0_2px_24px_rgba(0,0,0,.45)]">El Dorado</p>
+      <p class="mt-3 text-base md:text-xl text-[#F7F4EE]/95 [text-shadow:0_1px_12px_rgba(0,0,0,.45)]">Empanizadores artesanales</p>
+      <a href="#molido" class="inline-block mt-8 rounded-full bg-[#F7F4EE] text-[#2B2A26] px-8 py-3.5 text-sm font-semibold tracking-wide hover:opacity-90 transition-opacity">Ver sabores</a>
+    </div>
+  </section>
+
+  <!-- Espacio que deja ver el hero al inicio -->
+  <div id="inicio" data-section class="h-[100svh]" aria-hidden="true"></div>
+
+  <!-- Contenido que sube sobre el hero -->
+  <div class="relative z-10 -mt-24">
+    <div class="h-24" style={`background:linear-gradient(to bottom, transparent, ${PRODUCTS[0].tint})`} aria-hidden="true"></div>
+
+    <main>
+      {PRODUCTS.map((p) => (
+        <section id={p.id} data-section
+          class="relative min-h-[100svh] pt-16 flex items-center overflow-hidden"
+          style={`background:radial-gradient(60% 70% at 28% 50%, #FFFFFF99 0%, transparent 70%), ${p.tint}`}>
+          <p aria-hidden="true"
+   class="font-display italic absolute left-1/2 -translate-x-1/2 top-[64%] -translate-y-1/2 text-[15vw] leading-none whitespace-nowrap select-none md:left-auto md:translate-x-0 md:-right-6 md:top-1/2 md:text-[24vw]"
+   style={`color:${p.accent};opacity:.08`}>{p.nav}</p>
+          <div class="relative mx-auto w-full max-w-7xl px-6 md:px-8 py-10 grid lg:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-center">
+            <figure class={`justify-self-center bg-white p-2.5 ${imgShadow}`}>
+              <img src={p.image} alt={`Bolsa de empanizador El Dorado ${p.name}, ${p.weight}`}
+                   loading="lazy" width="1000" height="1333"
+                   class="h-[50svh] max-h-[350px] md:max-h-none lg:h-[70svh] w-auto max-w-full object-cover" />
+            </figure>
+
+            <!-- Móvil: todo centrado. md en adelante: orden y alineación originales -->
+            <div class="flex flex-col items-center text-center md:items-start md:text-left">
+              <p class={`order-first md:hidden text-[11px] font-medium tracking-[0.3em] uppercase text-[#6B675D] mb-2 ${textGlow}`}>Empanizador</p>
+
+              <h2 class={`order-1 font-display text-6xl sm:text-7xl lg:text-8xl leading-[1] tracking-tight ${textGlow}`}>{p.name}</h2>
+              <p class={`order-2 font-display italic mt-4 text-2xl sm:text-3xl leading-snug max-w-[24ch] ${textGlow}`} style={`color:${p.accent}`}>«{p.punchline}»</p>
+
+              <div class="order-5 md:order-3 mt-7 flex items-baseline justify-center md:justify-start gap-5">
+                <p class={`font-display text-4xl sm:text-5xl ${textGlow}`} style={`color:${p.accent}`}>{formatPrice(p)}</p>
+                <p class="text-[#6B675D]">{p.weight}</p>
+              </div>
+
+              <p class="order-3 md:order-4 mt-6 max-w-[48ch] leading-relaxed text-[#4A473F]">{p.description}</p>
+
+              <ul class="order-4 md:order-5 mt-5 space-y-2 text-[#4A473F] flex flex-col items-center md:items-start">
+                {p.seals.map((s) => (
+                  <li class="flex items-center gap-3">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="8.25" stroke={p.accent} stroke-width="1.5"/><path d="M5.5 9.2l2.4 2.3 4.6-4.8" stroke={p.accent} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    {s}
+                  </li>
+                ))}
+              </ul>
+
+              <a href={getWhatsAppLink(p)} target="_blank" rel="noopener"
+                 class="order-6 inline-block mt-8 md:mt-9 rounded-full px-9 py-4 text-sm font-semibold tracking-wide transition-opacity hover:opacity-90"
+                 style={`background:${p.accent};color:${p.ink}`}>
+                Comprar ahora
+              </a>
+            </div>
+          </div>
+        </section>
+      ))}
+
+      <!-- Historia -->
+      <section id="historia" data-section class="min-h-[100svh] pt-16 flex items-center bg-white">
+        <div class="mx-auto max-w-5xl px-6 md:px-8 py-16 grid md:grid-cols-[1fr_1.2fr] gap-10 md:gap-16 items-start">
+          <h2 class="font-display text-6xl sm:text-7xl leading-[1]">Nuestra historia</h2>
+          <div class="space-y-5 text-lg leading-relaxed max-w-[56ch] text-[#4A473F]">
+            <p>El Dorado empezó con una idea sencilla: un empanizador que se pegue bien, dore parejo y crujiera como debe.</p>
+            <p>Lo hacemos de forma natural y sin conservadores, y cada bolsa sale con el mismo cuidado, ya sea fino, con hierbas, con ajo o extra crujiente.</p>
+            <p>Si te gusta cocinar con ingredientes simples, aquí hay un sabor para tu cocina.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq" data-section class="min-h-[100svh] pt-16 flex items-center bg-[#DDE7D9]">
+        <div class="mx-auto max-w-3xl w-full px-6 md:px-8 py-16">
+          <h2 class="font-display text-6xl sm:text-7xl leading-[1]">Preguntas frecuentes</h2>
+          <div class="mt-10 space-y-3">
+            {faqs.map((f) => (
+              <details class="group bg-white/80 px-6 py-5 rounded-sm">
+                <summary class="flex items-center justify-between gap-4 cursor-pointer list-none font-display text-xl sm:text-2xl">
+                  {f.q}
+                  <span class="text-2xl text-[#5B7A5E] transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+                </summary>
+                <p class="mt-3 text-[#4A473F] leading-relaxed max-w-[56ch]">{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <a href={generalLink} target="_blank" rel="noopener" class="inline-block mt-8 underline underline-offset-4 text-[#3F5A47] hover:opacity-80">¿Otra duda? Escríbenos por WhatsApp</a>
+          <p class="mt-16 text-sm text-[#5C6A5C]">© El Dorado · Empanizadores</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- Menú: botón activo según la sección visible ----
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-nav]'));
+  const drawerLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-drawer-link]'));
+
+  function paint(a: HTMLAnchorElement, on: boolean) {
+    a.style.background = on ? a.dataset.accent! : '';
+    a.style.color = on ? a.dataset.ink! : '';
+    a.style.borderColor = on ? a.dataset.accent! : '';
+  }
+  function setActive(id: string) {
+    links.forEach((a) => {
+      const on = a.dataset.nav === id;
+      paint(a, on);
+      if (on) a.scrollIntoView({ inline: 'center', block: 'nearest' });
+    });
+    drawerLinks.forEach((a) => paint(a, a.dataset.drawerLink === id));
+  }
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+    { threshold: 0.55 }
+  );
+  document.querySelectorAll('[data-section]').forEach((s) => io.observe(s));
+
+  // ---- Drawer móvil ----
+  const menuBtn = document.getElementById('menu-btn')!;
+  const closeBtn = document.getElementById('menu-close')!;
+  const drawer = document.getElementById('drawer')!;
+  const overlay = document.getElementById('overlay')!;
+
+  function openMenu() {
+    drawer.classList.remove('-translate-x-full', 'invisible');
+    drawer.classList.add('translate-x-0');
+    overlay.classList.remove('opacity-0', 'pointer-events-none');
+    overlay.classList.add('opacity-100');
+    drawer.setAttribute('aria-hidden', 'false');
+    menuBtn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus({ preventScroll: true });
+  }
+  function closeMenu(returnFocus = true) {
+    drawer.classList.add('-translate-x-full', 'invisible');
+    drawer.classList.remove('translate-x-0');
+    overlay.classList.add('opacity-0', 'pointer-events-none');
+    overlay.classList.remove('opacity-100');
+    drawer.setAttribute('aria-hidden', 'true');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    if (returnFocus) menuBtn.focus({ preventScroll: true });
+  }
+
+  menuBtn.addEventListener('click', openMenu);
+  closeBtn.addEventListener('click', () => closeMenu());
+  overlay.addEventListener('click', () => closeMenu());
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+  // Al elegir una opción: cierra el panel y hace scroll suave a la sección
+  drawerLinks.forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = a.dataset.drawerLink!;
+      closeMenu(false);
+      requestAnimationFrame(() =>
+        document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+      );
+    })
+  );
+
+  // Si se agranda la ventana a escritorio con el panel abierto, ciérralo
+  window.matchMedia('(min-width: 768px)').addEventListener('change', (m) => { if (m.matches) closeMenu(false); });
+
+  // ---- Hero: se desvanece, se desenfoca y baja un poco con el scroll ----
+  const hero = document.getElementById('hero');
+  if (hero && !reduce) {
+    let ticking = false;
+    const update = () => {
+      const y = window.scrollY;
+      const p = Math.min(y / (window.innerHeight * 0.7), 1);
+      hero.style.opacity = String(1 - p);
+      hero.style.filter = `blur(${(p * 14).toFixed(1)}px)`;
+      hero.style.transform = `translate3d(0, ${(y * 0.25).toFixed(0)}px, 0) scale(${(1 + p * 0.04).toFixed(3)})`;
+      ticking = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
+</script>
+
+<style is:global>
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  details summary::-webkit-details-marker { display: none; }
+</style>
