@@ -16,7 +16,7 @@ export interface Product {
 
 export const CURRENCY = 'MXN';
 /** Número de WhatsApp en formato internacional, sin "+" ni espacios. CAMBIAR. */
-export const WHATSAPP_NUMBER = '5213318867947';
+export const WHATSAPP_NUMBER = '523334881355';
 
 export const PRODUCTS: Product[] = [
   { id: 'molido', nav: 'Molido', name: 'Molido', weight: '250 g', price: 17,
